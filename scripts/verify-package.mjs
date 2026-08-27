@@ -1,6 +1,8 @@
 import { pathToFileURL } from "node:url";
-import { PACKAGE_ENTRY_PATH, PACKAGE_FILE_ALLOWLIST } from "./constants.mjs";
+import { verifyPackageFiles } from "./package-files.mjs";
 import { runCommand } from "./smoke-package.mjs";
+
+export { verifyPackageFiles } from "./package-files.mjs";
 
 const NPM_COMMAND = process.platform === "win32" ? "npm.cmd" : "npm";
 const PACK_ARGUMENTS = ["pack", "--dry-run", "--json"];
@@ -8,40 +10,6 @@ const CURRENT_DIRECTORY = process.cwd();
 
 /** @typedef {{ path: string }} PackFile */
 /** @typedef {{ files: PackFile[] }} PackRecord */
-
-/**
- * @param {string} filePath
- * @returns {string}
- */
-function normalizePackagePath(filePath) {
-	return filePath.replaceAll("\\", "/").replace(/^\.\//u, "");
-}
-
-/**
- * @param {string[]} filePaths
- * @returns {{ ok: boolean, errors: string[] }}
- */
-export function verifyPackageFiles(filePaths) {
-	const normalizedPaths = filePaths.map(normalizePackagePath);
-	const seenPaths = new Set();
-	const errors = [];
-
-	for (const filePath of normalizedPaths) {
-		if (seenPaths.has(filePath)) {
-			errors.push(`Duplicate package file: ${filePath}`);
-		}
-		seenPaths.add(filePath);
-		if (!PACKAGE_FILE_ALLOWLIST.has(filePath)) {
-			errors.push(`Unexpected package file: ${filePath}`);
-		}
-	}
-
-	if (!seenPaths.has(PACKAGE_ENTRY_PATH)) {
-		errors.push(`Missing required package file: ${PACKAGE_ENTRY_PATH}`);
-	}
-
-	return { ok: errors.length === 0, errors };
-}
 
 /**
  * @param {string} rootDirectory

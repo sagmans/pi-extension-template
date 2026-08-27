@@ -13,10 +13,13 @@ import {
 	PI_PACKAGE_NAME,
 	PI_PACKAGE_VERSION,
 } from "./constants.mjs";
+import { verifyPackageFiles } from "./package-files.mjs";
 
 const execFileAsync = promisify(execFile);
 const NPM_COMMAND = process.platform === "win32" ? "npm.cmd" : "npm";
 const PI_BINARY_NAME = process.platform === "win32" ? "pi.cmd" : "pi";
+const TAR_COMMAND = "tar";
+const TAR_LIST_ARGUMENT = "-tzf";
 const TARBALL_EXTENSION = ".tgz";
 const TEMPORARY_PREFIX = "pi-extension-smoke-";
 const INSTALL_DIRECTORY_NAME = "install";
@@ -131,6 +134,18 @@ export async function smokePackage({ rootDirectory, tarballPath, commandRunner =
 		}
 
 		const packageName = await readPackageName(rootDirectory);
+		const archiveResult = await commandRunner(TAR_COMMAND, [TAR_LIST_ARGUMENT, selectedTarball], {
+			cwd: rootDirectory,
+		});
+		await requireSuccessfulCommand(archiveResult, "tarball listing");
+		const archiveFiles = archiveResult.stdout
+			.split(/\r?\n/u)
+			.filter((filePath) => filePath.length > 0 && !filePath.endsWith("/"));
+		const packageFileResult = verifyPackageFiles(archiveFiles);
+		if (!packageFileResult.ok) {
+			throw new Error(`Package allowlist failed: ${packageFileResult.errors.join("; ")}`);
+		}
+
 		const installRoot = join(temporaryRoot, INSTALL_DIRECTORY_NAME);
 		await mkdir(installRoot);
 		const installResult = await commandRunner(

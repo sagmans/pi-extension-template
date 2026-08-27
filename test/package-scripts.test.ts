@@ -2,7 +2,7 @@ import { mkdir, mkdtemp, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
-import { PACKAGE_ENTRY_PATH } from "../scripts/constants.mjs";
+import { PACKAGE_ENTRY_PATH, PACKAGE_FILE_ALLOWLIST } from "../scripts/constants.mjs";
 import {
 	parseTarballArgument,
 	runCommand,
@@ -37,6 +37,12 @@ function createSuccessfulRunner(options: { loadOutput?: string } = {}) {
 			const artifactDirectory = args.at(-1);
 			if (artifactDirectory === undefined) throw new Error("Missing artifact directory");
 			await writeFile(join(artifactDirectory, TARBALL_NAME), "fixture");
+		}
+		if (command === "tar") {
+			return {
+				...COMMAND_SUCCESS,
+				stdout: [...PACKAGE_FILE_ALLOWLIST].map((path) => `package/${path}`).join("\n"),
+			};
 		}
 		if (args[0] === "install") {
 			const prefixIndex = args.indexOf("--prefix");
@@ -93,7 +99,7 @@ describe("package smoke", () => {
 		const result = await smokePackage({ rootDirectory, commandRunner: runner });
 
 		expect(result.tarballPath).toBe(TARBALL_NAME);
-		expect(calls.map(({ args }) => args[0])).toEqual(["pack", "install", "--extension"]);
+		expect(calls.map(({ args }) => args[0])).toEqual(["pack", "-tzf", "install", "--extension"]);
 	});
 
 	it("loads a supplied absolute tarball without repacking", async () => {
@@ -105,6 +111,20 @@ describe("package smoke", () => {
 		await smokePackage({ rootDirectory, tarballPath, commandRunner: runner });
 
 		expect(calls.some(({ args }) => args[0] === "pack")).toBe(false);
+		expect(calls.some(({ command }) => command === "tar")).toBe(true);
+	});
+
+	it("rejects tarball contents outside the exact allowlist", async () => {
+		const rootDirectory = await createFixtureRoot();
+		const successful = createSuccessfulRunner();
+		const unexpectedFileRunner = async (command: string, args: string[]) =>
+			command === "tar"
+				? { ...COMMAND_SUCCESS, stdout: "package/index.ts\npackage/secret.txt\n" }
+				: successful.runner(command, args);
+
+		await expect(
+			smokePackage({ rootDirectory, commandRunner: unexpectedFileRunner }),
+		).rejects.toThrow("Package allowlist failed");
 	});
 
 	it("rejects pack and install failures", async () => {
