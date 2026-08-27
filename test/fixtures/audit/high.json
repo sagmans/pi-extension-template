@@ -1,0 +1,35 @@
+{
+	"auditReportVersion": 2,
+	"vulnerabilities": {
+		"example-high": {
+			"name": "example-high",
+			"severity": "high",
+			"isDirect": false,
+			"via": [
+				{
+					"source": 123456,
+					"name": "example-high",
+					"dependency": "example-high",
+					"title": "Example high advisory",
+					"url": "https://github.com/advisories/GHSA-example-high",
+					"severity": "high",
+					"range": "<2.0.0"
+				}
+			],
+			"effects": [],
+			"range": "<2.0.0",
+			"nodes": ["node_modules/example-high"],
+			"fixAvailable": true
+		}
+	},
+	"metadata": {
+		"vulnerabilities": {
+			"info": 0,
+			"low": 0,
+			"moderate": 0,
+			"high": 1,
+			"critical": 0,
+			"total": 1
+		}
+	}
+}
