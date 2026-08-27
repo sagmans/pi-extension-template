@@ -1,0 +1,6 @@
+{
+	"standardVersion": "2026-08-27",
+	"platforms": ["linux"],
+	"nodePolicy": "current-lts",
+	"packageShape": "single-extension"
+}
