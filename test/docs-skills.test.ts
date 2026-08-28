@@ -6,6 +6,13 @@ import { describe, expect, it } from "vitest";
 const REPOSITORY_ROOT = fileURLToPath(new URL("..", import.meta.url));
 const REFERENCE_ONLY_STATEMENT =
 	"Reference blueprint only: this repository is not shipped, deployed, released, or published.";
+const NO_CONTRIBUTIONS_STATEMENT =
+	"This repository is a general reference blueprint and does not accept contributions.";
+const REPOSITORY_CONTRIBUTION_INVITATIONS = [
+	"Use public issues only for non-sensitive bugs and proposals.",
+	"Before a pull request:",
+	"this blueprint's maintainers require signed DCO commits",
+];
 const REQUIRED_DOCUMENTS = [
 	"README.md",
 	"AGENTS.md",
@@ -62,6 +69,15 @@ describe("blueprint documentation", () => {
 		for (const skill of SKILLS) expect(readme).toContain(skill);
 		for (const document of REQUIRED_DOCUMENTS.filter((path) => path !== "README.md")) {
 			expect(readme).toContain(document);
+		}
+	});
+
+	it("keeps contribution guidance target-facing", async () => {
+		const contributing = await readRepositoryFile("CONTRIBUTING.md");
+
+		expect(contributing).toContain(NO_CONTRIBUTIONS_STATEMENT);
+		for (const invitation of REPOSITORY_CONTRIBUTION_INVITATIONS) {
+			expect(contributing).not.toContain(invitation);
 		}
 	});
 
