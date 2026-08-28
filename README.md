@@ -28,7 +28,7 @@ Use [audit-pi-extension](.agents/skills/audit-pi-extension/SKILL.md):
 Read this repository's README completely. Use the audit-pi-extension skill against the target repository at the absolute path I provide. Make no target changes. Report required drift, recommendations, intentional divergence, and exact validation commands.
 ```
 
-Audit is evidence-only. Missing provenance means legacy, not automatically unsafe.
+Audit is evidence-only. It also reports unsupported Pi SDK usage, private internals, monkey patches, and undocumented runtime coupling with public-API suggestions; it takes no corrective action. Missing provenance means legacy, not automatically unsafe.
 
 ## Onboard, migrate, or update an existing repository
 
@@ -36,7 +36,7 @@ Run audit first, review its classification, then run `adopt-pi-extension-templat
 
 ## What the blueprint standardizes
 
-- Current Node LTS, npm lockfile, TypeScript source, and one Pi extension per package
+- Current Node LTS pinned through mise, npm lockfile, TypeScript source, and one Pi extension per package
 - Biome, strict TypeScript, Vitest, and 80% global coverage
 - High-or-critical dependency audit policy
 - Package allowlist and exact packed-artifact Pi-load smoke
@@ -69,12 +69,12 @@ Nothing here releases. Target repositories adapt `.github/workflows/release.yml.
 - [CONTEXT.md](CONTEXT.md) — domain language
 - [docs/diagnostics.md](docs/diagnostics.md), [docs/configuration.md](docs/configuration.md), [docs/storage.md](docs/storage.md) — adapt-or-remove extension guidance
 - [docs/adr/0001-reference-blueprint.md](docs/adr/0001-reference-blueprint.md), [docs/adr/0002-agent-driven-adoption.md](docs/adr/0002-agent-driven-adoption.md) — architecture decisions
-- [manifest schema](docs/standard/manifest.md) and [2026-08-27 migration](docs/standard/migrations/2026-08-27.md)
+- [manifest schema](docs/standard/manifest.md), [2026-08-27 baseline](docs/standard/migrations/2026-08-27.md), and [2026-08-28 migration](docs/standard/migrations/2026-08-28.md)
 - `.github/ISSUE_TEMPLATE/bug_report.yml`, `.github/ISSUE_TEMPLATE/config.yml`, `.github/pull_request_template.md` — community examples
 
 ## Standard version and migrations
 
-The blueprint standard version is `2026-08-27`. Target provenance lives in `.pi-extension-template.json`. Apply every migration note after the target's recorded date in chronological order; update the marker only after successful verification.
+The blueprint standard version is `2026-08-28`. Target provenance lives in `.pi-extension-template.json`. Apply every migration note after the target's recorded date in chronological order; update the marker only after successful verification.
 
 ## Security
 

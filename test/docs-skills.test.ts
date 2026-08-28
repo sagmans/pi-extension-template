@@ -22,6 +22,7 @@ const REQUIRED_DOCUMENTS = [
 	"docs/storage.md",
 	"docs/adr/0001-reference-blueprint.md",
 	"docs/adr/0002-agent-driven-adoption.md",
+	"docs/standard/migrations/2026-08-28.md",
 ];
 const ADAPT_OR_REMOVE_DOCUMENTS = [
 	"docs/diagnostics.md",
@@ -64,6 +65,20 @@ describe("blueprint documentation", () => {
 		}
 	});
 
+	it("uses mise as the only runtime manager", async () => {
+		const [mise, development, readme] = await Promise.all([
+			readRepositoryFile("mise.toml"),
+			readRepositoryFile("DEVELOPMENT.md"),
+			readRepositoryFile("README.md"),
+		]);
+
+		expect(mise).toContain('node = "24.20.0"');
+		expect(development).toContain("mise install");
+		expect(development).toContain("mise exec -- npm ci --ignore-scripts");
+		expect(readme).toContain("mise");
+		await expect(access(resolve(REPOSITORY_ROOT, ".nvmrc"))).rejects.toThrow();
+	});
+
 	it("keeps AGENTS concise and points to operational authority", async () => {
 		const agents = await readRepositoryFile("AGENTS.md");
 
@@ -87,6 +102,36 @@ describe("blueprint documentation", () => {
 			"never falls back to an npm token",
 		]) {
 			expect(release).toContain(phrase);
+		}
+	});
+
+	it("documents the complete package publishing lifecycle", async () => {
+		const [release, setup] = await Promise.all([
+			readRepositoryFile("RELEASE.md"),
+			readRepositoryFile("docs/npm-release-setup.md"),
+		]);
+
+		for (const heading of [
+			"## 1. Day 0",
+			"## 2. New package bootstrap",
+			"## 3. Existing package onboarding",
+			"## 4. Activate trusted publishing",
+			"## 5. Recurring release",
+			"## 6. Maintenance",
+			"## 7. Failure and recovery",
+		]) {
+			expect(release).toContain(heading);
+		}
+		for (const phrase of [
+			"npm login",
+			"two-factor authentication",
+			"required reviewers",
+			"Workflow filename",
+			"Allowed actions",
+			"id-token: write",
+			"Do not configure `NPM_TOKEN`",
+		]) {
+			expect(setup).toContain(phrase);
 		}
 	});
 
@@ -131,6 +176,24 @@ describe("blueprint skills", () => {
 			await expect(
 				access(resolve(REPOSITORY_ROOT, dirname(skillPath), target.split("#", 1)[0])),
 			).resolves.toBeUndefined();
+		}
+	});
+
+	it("audits unsupported Pi SDK usage without changing targets", async () => {
+		const [audit, checklist] = await Promise.all([
+			readRepositoryFile(".agents/skills/audit-pi-extension/SKILL.md"),
+			readRepositoryFile(".agents/skills/audit-pi-extension/references/checklist.md"),
+		]);
+
+		for (const phrase of [
+			"Pi SDK conformance",
+			"private or internal imports",
+			"monkey patches",
+			"undocumented runtime coupling",
+			"path, evidence, compatibility or security risk, public SDK alternative, and validation suggestion",
+			"Report only",
+		]) {
+			expect(`${audit}\n${checklist}`).toContain(phrase);
 		}
 	});
 

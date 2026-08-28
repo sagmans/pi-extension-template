@@ -3,14 +3,18 @@ import { describe, expect, it } from "vitest";
 
 const MANIFEST_PATH = new URL("../.pi-extension-template.json", import.meta.url);
 const MANIFEST_DOCUMENT_PATH = new URL("../docs/standard/manifest.md", import.meta.url);
-const MIGRATION_DOCUMENT_PATH = new URL(
+const BASELINE_MIGRATION_DOCUMENT_PATH = new URL(
 	"../docs/standard/migrations/2026-08-27.md",
+	import.meta.url,
+);
+const CURRENT_MIGRATION_DOCUMENT_PATH = new URL(
+	"../docs/standard/migrations/2026-08-28.md",
 	import.meta.url,
 );
 const REQUIRED_KEYS = ["nodePolicy", "packageShape", "platforms", "standardVersion"];
 const ALLOWED_PLATFORMS = new Set(["linux", "macos", "windows"]);
 const ISO_DATE_PATTERN = /^\d{4}-\d{2}-\d{2}$/u;
-const EXPECTED_STANDARD_VERSION = "2026-08-27";
+const EXPECTED_STANDARD_VERSION = "2026-08-28";
 const EXPECTED_NODE_POLICY = "current-lts";
 const EXPECTED_PACKAGE_SHAPE = "single-extension";
 
@@ -48,14 +52,18 @@ describe("blueprint manifest", () => {
 	});
 
 	it("documents schema and baseline migration", async () => {
-		const [manifestDocument, migrationDocument] = await Promise.all([
+		const [manifestDocument, baselineMigration, currentMigration] = await Promise.all([
 			readFile(MANIFEST_DOCUMENT_PATH, "utf8"),
-			readFile(MIGRATION_DOCUMENT_PATH, "utf8"),
+			readFile(BASELINE_MIGRATION_DOCUMENT_PATH, "utf8"),
+			readFile(CURRENT_MIGRATION_DOCUMENT_PATH, "utf8"),
 		]);
 
 		expect(manifestDocument).toContain("exactly four required fields");
 		expect(manifestDocument).toContain("successful verification");
-		expect(migrationDocument).toContain("Baseline adoption");
-		expect(migrationDocument).toContain("npm run verify:ci");
+		expect(baselineMigration).toContain("Baseline adoption");
+		expect(currentMigration).toContain("mise");
+		expect(currentMigration).toContain("Pi SDK conformance");
+		expect(currentMigration).toContain("package publishing lifecycle");
+		expect(currentMigration).toContain("npm run verify:ci");
 	});
 });

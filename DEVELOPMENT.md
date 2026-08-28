@@ -2,10 +2,11 @@
 
 ## Environment
 
-Use Node `24.20.0` and the committed npm lockfile:
+Use mise to install pinned Node `24.20.0`, then install the committed npm lockfile:
 
 ```bash
-npm ci --ignore-scripts
+mise install
+mise exec -- npm ci --ignore-scripts
 ```
 
 Lifecycle scripts are disabled because this blueprint does not require them and dependency installation is a supply-chain boundary.
@@ -37,6 +38,8 @@ Before changing a dependency:
 5. Review lockfile and package-content changes.
 6. Run `npm run verify:ci` and real target usage.
 7. Submit a normal reviewed PR.
+
+Update `mise.toml`, `package.json#engines`, CI, documentation, and the lockfile together when advancing Node.
 
 Dependabot opens weekly npm and GitHub Actions PRs. Treat them as proposals; perform the same research and verification.
 

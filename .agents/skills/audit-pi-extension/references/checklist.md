@@ -8,6 +8,15 @@
 - Imported Pi core packages declared as wildcard peers and exact development dependencies
 - Date provenance valid or target explicitly legacy
 
+## Pi SDK conformance
+
+- Runtime entrypoint uses the documented extension factory and public `ExtensionAPI`
+- Imports use documented package exports; no private or internal imports
+- No monkey patches, prototype/global mutation, or undocumented runtime coupling
+- No unsupported host assumptions or direct bypasses around public SDK registration APIs
+- Every evidenced violation reports path, evidence, compatibility or security risk, public SDK alternative, and validation suggestion
+- Report only; never modify target code or configuration
+
 ## Runtime and quality
 
 - Current Node LTS and committed npm lockfile

@@ -14,7 +14,7 @@ const ACTIVE_WORKFLOW_PATTERN = /\.ya?ml$/u;
 const FULL_SHA_ACTION_PATTERN = /uses:\s+[\w-]+\/[\w-]+@[a-f0-9]{40}(?:\s|$)/gu;
 const APPROVED_ACTIONS = [
 	"actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
-	"actions/setup-node@820762786026740c76f36085b0efc47a31fe5020",
+	"jdx/mise-action@3c2e0cf82a5b2e5249f0d3635a4d83d0ae861518",
 	"actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a",
 	"actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c",
 ];
@@ -36,7 +36,9 @@ describe("active CI", () => {
 		const ci = await read(CI_PATH);
 
 		expect(ci).toContain("contents: read");
-		expect(ci).toContain('node-version: "24.20.0"');
+		expect(ci).toContain("jdx/mise-action@3c2e0cf82a5b2e5249f0d3635a4d83d0ae861518");
+		expect(ci).not.toContain("actions/setup-node");
+		expect(ci).not.toContain("node-version:");
 		expect(ci).toContain("persist-credentials: false");
 		expect(ci).toContain("npm ci --ignore-scripts");
 		expect(ci).toContain("npm run verify:ci");
@@ -64,6 +66,9 @@ describe("release example", () => {
 			expect(release).toContain(phrase);
 		}
 		for (const action of APPROVED_ACTIONS) expect(release).toContain(action);
+		expect(release).not.toContain("actions/setup-node");
+		expect(release.match(/jdx\/mise-action@/gu)).toHaveLength(3);
+		expect(release).toContain("NPM_CONFIG_REGISTRY: https://registry.npmjs.org");
 		expect(release).not.toMatch(/NPM_TOKEN|NODE_AUTH_TOKEN|npm_[A-Za-z0-9]+/u);
 	});
 });
