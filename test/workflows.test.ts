@@ -12,9 +12,11 @@ const COMMUNITY_PATHS = [
 ];
 const ACTIVE_WORKFLOW_PATTERN = /\.ya?ml$/u;
 const FULL_SHA_ACTION_PATTERN = /uses:\s+[\w-]+\/[\w-]+@[a-f0-9]{40}(?:\s|$)/gu;
+const MISE_MINIMUM_RELEASE_AGE = "7d";
+const DEPENDABOT_COOLDOWN_DAYS = 7;
 const APPROVED_ACTIONS = [
 	"actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
-	"jdx/mise-action@3c2e0cf82a5b2e5249f0d3635a4d83d0ae861518",
+	"jdx/mise-action@c2a87611a18de5b3828c5652fe268e992400cb5c",
 	"actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a",
 	"actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c",
 ];
@@ -36,7 +38,8 @@ describe("active CI", () => {
 		const ci = await read(CI_PATH);
 
 		expect(ci).toContain("contents: read");
-		expect(ci).toContain("jdx/mise-action@3c2e0cf82a5b2e5249f0d3635a4d83d0ae861518");
+		expect(ci).toContain(APPROVED_ACTIONS[1]);
+		expect(ci).toContain(`minimum_release_age: ${MISE_MINIMUM_RELEASE_AGE}`);
 		expect(ci).not.toContain("actions/setup-node");
 		expect(ci).not.toContain("node-version:");
 		expect(ci).toContain("persist-credentials: false");
@@ -68,6 +71,9 @@ describe("release example", () => {
 		for (const action of APPROVED_ACTIONS) expect(release).toContain(action);
 		expect(release).not.toContain("actions/setup-node");
 		expect(release.match(/jdx\/mise-action@/gu)).toHaveLength(3);
+		expect(
+			release.match(new RegExp(`minimum_release_age: ${MISE_MINIMUM_RELEASE_AGE}`, "gu")),
+		).toHaveLength(3);
 		expect(release).toContain("NPM_CONFIG_REGISTRY: https://registry.npmjs.org");
 		expect(release).not.toMatch(/NPM_TOKEN|NODE_AUTH_TOKEN|npm_[A-Za-z0-9]+/u);
 	});
@@ -81,6 +87,11 @@ describe("repository automation", () => {
 		expect(dependabot).toContain("package-ecosystem: npm");
 		expect(dependabot.match(/interval: weekly/gu)).toHaveLength(2);
 		expect(dependabot).toContain("open-pull-requests-limit: 5");
+		expect(
+			dependabot.match(new RegExp(`default-days: ${DEPENDABOT_COOLDOWN_DAYS}`, "gu")) ?? [],
+		).toHaveLength(2);
+		expect(dependabot).toContain('dependency-name: "@types/node"');
+		expect(dependabot).toContain("version-update:semver-major");
 	});
 
 	it("provides privacy-safe contribution templates", async () => {
