@@ -13,6 +13,7 @@ const COMMUNITY_PATHS = [
 const ACTIVE_WORKFLOW_PATTERN = /\.ya?ml$/u;
 const FULL_SHA_ACTION_PATTERN = /uses:\s+[\w-]+\/[\w-]+@[a-f0-9]{40}(?:\s|$)/gu;
 const MISE_MINIMUM_RELEASE_AGE = "7d";
+const DEPENDABOT_COOLDOWN_DAYS = 7;
 const APPROVED_ACTIONS = [
 	"actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
 	"jdx/mise-action@c2a87611a18de5b3828c5652fe268e992400cb5c",
@@ -86,6 +87,11 @@ describe("repository automation", () => {
 		expect(dependabot).toContain("package-ecosystem: npm");
 		expect(dependabot.match(/interval: weekly/gu)).toHaveLength(2);
 		expect(dependabot).toContain("open-pull-requests-limit: 5");
+		expect(
+			dependabot.match(new RegExp(`default-days: ${DEPENDABOT_COOLDOWN_DAYS}`, "gu")) ?? [],
+		).toHaveLength(2);
+		expect(dependabot).toContain('dependency-name: "@types/node"');
+		expect(dependabot).toContain("version-update:semver-major");
 	});
 
 	it("provides privacy-safe contribution templates", async () => {
