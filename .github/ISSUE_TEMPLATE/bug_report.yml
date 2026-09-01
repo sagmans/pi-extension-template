@@ -1,0 +1,53 @@
+name: Bug report
+description: Report a reproducible, non-sensitive extension defect
+title: "bug: "
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Do not include prompts, session files, secrets, or private paths. Report security issues privately through SECURITY.md.
+
+  - type: input
+    id: extension-version
+    attributes:
+      label: Extension version
+    validations:
+      required: true
+
+  - type: input
+    id: environment
+    attributes:
+      label: Pi, Node, OS, and terminal versions
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Minimal reproduction
+      description: Use synthetic data and redact private values.
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behavior
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: privacy
+    attributes:
+      label: Privacy confirmation
+      options:
+        - label: I removed prompts, session content, secrets, usernames, and private paths.
+          required: true

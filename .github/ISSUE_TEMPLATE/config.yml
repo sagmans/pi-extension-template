@@ -1,0 +1,5 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Private security report
+    url: https://github.com/sagmans/pi-extension-template/security/advisories/new
+    about: Report vulnerabilities privately; adapt this URL in target repositories.
