@@ -13,7 +13,7 @@ Require an absolute target repository path. Resolve this skill's repository as b
 
 ## Workflow
 
-1. Read blueprint `README.md`, `docs/standard/manifest.md`, every migration after target provenance, [the checklist](references/checklist.md), and [docs/standard/host-pitfalls.md](docs/standard/host-pitfalls.md). Host-API claims must cite verified evidence such as that page before they may block adoption.
+1. Read blueprint `README.md`, `docs/standard/manifest.md`, every migration after target provenance, [the checklist](references/checklist.md), and [docs/standard/host-pitfalls.md](../../../docs/standard/host-pitfalls.md). Host-API claims must cite verified evidence such as that page before they may block adoption.
 2. Read all target instructions before inspection.
 3. Inspect target Git state, package shape, runtime entrypoint, dependencies, configs, tests, package contents, CI/release automation, docs, security, and provenance.
 4. Audit Pi SDK conformance against official extension documentation and exported public types. Trace extension imports and host integration. Find private or internal imports, monkey patches, prototype/global mutation, undocumented runtime coupling, unsupported host assumptions, and bypasses around `ExtensionAPI`. Do not label uncertain usage a violation; identify missing evidence.

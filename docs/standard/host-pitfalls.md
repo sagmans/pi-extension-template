@@ -78,10 +78,10 @@ fires and trust flips.
 
 ## 5. Local tarball installs fail at runtime
 
-`pi install <path>.tgz` records the tarball path in settings
-(`dist/package-manager-cli.js` records local-path packages; local files
-load as single extensions per `docs/packages.md`). Runtime then tries to
-load the tarball path as a module and Node's ESM loader rejects it with
+`pi install <path>.tgz` resolves the local path and persists it into
+settings (`dist/core/package-manager.js`, `installAndPersist`); local
+files then load as single extensions per `docs/packages.md`. Runtime tries
+to load the tarball path as a module and Node's ESM loader rejects it with
 `Unknown file extension ".tgz"` — the recorded package is unloadable.
 
 **Pitfall:** packaging smoke tests that install a packed tarball pass the
@@ -106,13 +106,16 @@ flag as unknown for it (`Unknown option --no-extensions for "install"`,
 same file).
 
 **Pitfall:** automation that prefixes global flags before package
-subcommands silently runs a normal agent session instead of installing, with
-no error; the "installation" never happened.
+subcommands runs a normal agent session instead of installing; the
+"installation" never happened. (The normal session itself may fail or touch
+the network depending on configuration — that is unrelated to the missed
+dispatch.)
 
-**Check:** in a throwaway agent dir, run `pi --no-extensions install
-<pkg-dir>` with stdin closed and inspect settings: no package entry exists
-and no install progress printed. Run `pi install <pkg-dir> --no-extensions`:
-it exits non-zero with the unknown-option error.
+**Check:** offline (`PI_OFFLINE=1`), in a throwaway agent dir, run
+`pi --no-extensions install <pkg-dir>` with stdin closed; the process may
+exit zero or non-zero — assert only that no install progress printed and the
+settings file has no package entry. Then run `pi install <pkg-dir>
+--no-extensions`: it exits non-zero with the unknown-option error.
 
 ## Verification harness notes
 
