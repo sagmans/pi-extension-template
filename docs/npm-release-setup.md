@@ -2,6 +2,42 @@
 
 Apply only to a target repository intended for public npm release. Follow the numbered lifecycle in [`RELEASE.md`](../RELEASE.md).
 
+Set all release inputs before running automation:
+
+```bash
+export NPM_ACCOUNT=maintainer
+export PKG_NAME=@scope/package
+export PKG_VERSION=1.0.0
+export REPO=owner/repository
+export WORKFLOW_FILE=release.yml
+export ENVIRONMENT=npm-release
+export REVIEWER=owner
+export TAG_PATTERN='v*'
+```
+
+Run read-only checks first. Preview each mutation before repeating it with explicit confirmation:
+
+```bash
+bash scripts/npm/preflight.sh
+bash scripts/npm/validate-workflow.sh
+
+DRY_RUN=1 CONFIRM=bootstrap-publish bash scripts/npm/bootstrap-publish.sh
+CONFIRM=bootstrap-publish bash scripts/npm/bootstrap-publish.sh
+
+DRY_RUN=1 CONFIRM=setup-github-release bash scripts/npm/setup-github-release.sh
+CONFIRM=setup-github-release bash scripts/npm/setup-github-release.sh
+
+DRY_RUN=1 CONFIRM=configure-trust bash scripts/npm/configure-trust.sh
+CONFIRM=configure-trust bash scripts/npm/configure-trust.sh
+
+DRY_RUN=1 CONFIRM=harden-publishing bash scripts/npm/harden-publishing.sh
+CONFIRM=harden-publishing bash scripts/npm/harden-publishing.sh
+
+bash scripts/npm/verify.sh
+```
+
+Manual interaction is limited to npm login, passkey or two-factor authentication challenges, and release approvals.
+
 ## 1. npm account and package access
 
 1. Create the maintainer account or organization on npm.
@@ -12,33 +48,27 @@ Apply only to a target repository intended for public npm release. Follow the nu
 
 ## 2. GitHub environment
 
-1. In repository **Settings → Environments**, create `npm-release`.
-2. Configure required reviewers with the package owner or release maintainers.
-3. Prevent self-review when repository governance supports it.
-4. Limit deployment branches/tags to the release policy.
+Use `scripts/npm/setup-github-release.sh` as the primary setup path. It configures the approval environment, reviewer, tag deployment policy, and admin-only release-tag ruleset through the GitHub API.
+
+1. Run it with `DRY_RUN=1 CONFIRM=setup-github-release`.
+2. Inspect the planned API requests.
+3. Run it with `CONFIRM=setup-github-release`.
+4. Run `scripts/npm/verify.sh` to read back the resulting state.
 5. Keep repository Actions permissions read-only by default. Only the publish job receives `id-token: write`; this permits requesting an OIDC token, not repository writes.
+
+UI fallback: If the GitHub CLI or required API is unavailable, use repository **Settings → Environments** and **Settings → Rules → Rulesets** to apply the same reviewer, tag policy, and admin-only restrictions. Then run `scripts/npm/verify.sh`.
 
 ## 3. npm trusted publisher
 
-Use npm package **Settings → Trusted Publisher → GitHub Actions** and enter exact, case-sensitive values:
+Use `scripts/npm/configure-trust.sh` as the primary setup path after the package exists. The caller must have package write access, npm `11.15.0` or newer, and account two-factor authentication enabled.
 
-1. **Organization or user:** GitHub owner.
-2. **Repository:** repository name.
-3. **Workflow filename:** `release.yml`, filename only.
-4. **Environment name:** `npm-release`.
-5. **Allowed actions:** `npm publish` only.
+1. Authenticate with npm.
+2. Run it with `DRY_RUN=1 CONFIRM=configure-trust`.
+3. Inspect the planned `npm trust github` command.
+4. Run it with `CONFIRM=configure-trust`.
+5. Run `scripts/npm/verify.sh` to read back the trusted-publisher identity and permission.
 
-Alternatively, with authenticated npm `11.15.0` or newer:
-
-```bash
-npm trust github @scope/package \
-  --file release.yml \
-  --repo owner/repository \
-  --env npm-release \
-  --allow-publish
-```
-
-The package must already exist, the caller needs package write access, and account two-factor authentication must be enabled.
+UI fallback: If `npm trust` is unavailable, use npm package **Settings → Trusted Publisher → GitHub Actions**. Enter the exact, case-sensitive GitHub owner and repository, **Workflow filename:** `WORKFLOW_FILE`, and environment: `ENVIRONMENT`. Set **Allowed actions:** `npm publish` only, then run `scripts/npm/verify.sh`.
 
 ## 4. Workflow activation
 
