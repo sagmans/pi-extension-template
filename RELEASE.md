@@ -17,8 +17,8 @@ npm trusted publishing requires the package to exist first. Bootstrap only the i
 
 1. Prepare and merge the initial release PR with the intended version and changelog.
 2. Refresh the merged commit, repeat full verification, create a signed `vX.Y.Z` tag, and obtain explicit approval before pushing it.
-3. Pack once into a clean directory. Run package verification and load that absolute `.tgz` through Pi.
-4. Run `npm login`, verify the intended owner with `npm whoami`, then publish that exact tarball using interactive two-factor authentication. Add `--access public` for the first public scoped release.
+3. The bootstrap packs once into a clean directory. Run package verification and load the same absolute tarball through Pi.
+4. Run `npm login`, verify the intended owner with `npm whoami`, then publish the same absolute tarball using interactive two-factor authentication. Add `--access public` for the first public scoped release.
 5. Confirm the version, visibility, owners, package contents, and repository link on npm.
 6. Complete sections 4 and 6 before the next release. The manual bootstrap is a one-time exception and does not have CI provenance; never repeat it for routine versions.
 
