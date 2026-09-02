@@ -11,8 +11,8 @@ as current on newer Pi lines.
 `pi.registerShortcut(shortcut, { handler })` does not invoke `handler` from a
 global dispatch table. The host routes the keystroke to the active editor's
 `onExtensionShortcut?: (data: string) => boolean` callback
-(`dist/modes/interactive/components/custom-editor.d.ts`,
-`custom-editor.js` `handleInput`).
+(`dist/modes/interactive/components/custom-editor.d.ts`; dispatched at the
+top of `handleInput` in `dist/modes/interactive/components/custom-editor.js`).
 
 **Pitfall:** an extension that replaces the editor component but delegates
 input without first consulting `this.onExtensionShortcut?.(data)` silently
@@ -54,43 +54,65 @@ another via `pi.events.on`.
 
 ## 4. `project_trust` fires only for Pi-relevant dynamic configs
 
-The `project_trust` event is evaluated when the project directory contains
-dynamic configs Pi itself loads (for example `.pi/settings.json`); an
-extension-specific file such as `.pi/<extension>.json` does not trigger
-evaluation, and the project is treated as trusted
-(`docs/extensions.md` trust sections).
+Trust resolution checks a fixed whitelist of host-relevant resources before
+anything else: `TRUST_REQUIRING_PROJECT_CONFIG_RESOURCES`
+(`settings.json`, `extensions`, `skills`, `prompts`, `themes`,
+`SYSTEM.md`, ...) under `<CONFIG_DIR_NAME>/`, plus any
+`.agents/skills` directory up the tree
+(`dist/core/trust-manager.js`, `hasTrustRequiringProjectResources`).
+When no whitelisted resource exists, `resolveProjectTrusted` returns
+`true` immediately — before the `project_trust` event, before the stored
+decision, before any prompt (`dist/core/project-trust.js`). An
+extension-specific file such as `.pi/<extension>.json` is not on the
+whitelist and never triggers evaluation.
 
 **Pitfall:** treating `ctx.isProjectTrusted()` as "the user answered a
-prompt" — with no Pi-relevant config present it resolves to a default.
+prompt" — with no whitelisted resource present the project is trusted by
+default and `project_trust` never fires.
 
-**Check:** start Pi in a project whose `.pi` holds only an extension config;
-observe `project_trust` never firing. Add `.pi/settings.json` and a probe
-extension returning `{ trusted: "no" }`; observe it firing.
+**Check:** start Pi in a project whose `.pi` holds only an extension config
+and log `project_trust` plus `ctx.isProjectTrusted()` from a probe
+extension: the event never fires, trust is `true`. Add
+`.pi/settings.json` and a probe returning `{ trusted: "no" }`: the event
+fires and trust flips.
 
 ## 5. Local tarball installs fail at runtime
 
-`pi install <path>.tgz` records the tarball path in settings, but runtime
-extension loading rejects it: `Unknown file extension ".tgz"`
-(`docs/packages.md` describes local paths as files or directories loaded by
-package rules).
+`pi install <path>.tgz` records the tarball path in settings
+(`dist/package-manager-cli.js` records local-path packages; local files
+load as single extensions per `docs/packages.md`). Runtime then tries to
+load the tarball path as a module and Node's ESM loader rejects it with
+`Unknown file extension ".tgz"` — the recorded package is unloadable.
 
 **Pitfall:** packaging smoke tests that install a packed tarball pass the
 install step and break on the next launch.
 
-**Check:** extract the tarball and `pi install` the extracted directory;
-that path loads.
+**Check:** with an isolated agent dir, first reproduce the failure —
+`pi install <pkg>.tgz`, then start Pi and observe the
+`Failed to load extension` / `.tgz` error. Then extract the tarball and
+`pi install` the extracted directory; that path loads and the extension
+activates.
 
-## 6. `--no-extensions` blocks `pi install` writes
+## 6. Package subcommands must be the first CLI argument
 
-Running `pi --no-extensions install <pkg>` prints the install banner but
-records nothing in settings; package installation runs through the extension
-subsystem the flag disables.
+Package-command dispatch reads only `args[0]`
+(`dist/package-manager-cli.js`, `parsePackageCommand`: recognized
+subcommands are `install`, `remove`/`uninstall`, `update`, `list`).
+`pi --no-extensions install <pkg>` therefore never dispatches the install:
+`--no-extensions` is parsed as a normal-session flag and
+`install <pkg>` is treated as prompt text. Conversely,
+`pi install <pkg> --no-extensions` parses the subcommand but rejects the
+flag as unknown for it (`Unknown option --no-extensions for "install"`,
+same file).
 
-**Pitfall:** automated install verification under `--no-extensions` reports
-success with no effect.
+**Pitfall:** automation that prefixes global flags before package
+subcommands silently runs a normal agent session instead of installing, with
+no error; the "installation" never happened.
 
-**Check:** install under the flag, inspect the agent dir settings file; no
-package entry exists.
+**Check:** in a throwaway agent dir, run `pi --no-extensions install
+<pkg-dir>` with stdin closed and inspect settings: no package entry exists
+and no install progress printed. Run `pi install <pkg-dir> --no-extensions`:
+it exits non-zero with the unknown-option error.
 
 ## Verification harness notes
 
