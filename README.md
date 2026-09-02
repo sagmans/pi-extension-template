@@ -68,6 +68,7 @@ Nothing here releases. Target repositories adapt `.github/workflows/release.yml.
 - [CHANGELOG.md](CHANGELOG.md) — standard evolution
 - [CONTEXT.md](CONTEXT.md) — domain language
 - [docs/diagnostics.md](docs/diagnostics.md), [docs/configuration.md](docs/configuration.md), [docs/storage.md](docs/storage.md) — adapt-or-remove extension guidance
+- [docs/standard/host-pitfalls.md](docs/standard/host-pitfalls.md) — verified host integration failure modes with citations and reproducible checks
 - [docs/adr/0001-reference-blueprint.md](docs/adr/0001-reference-blueprint.md), [docs/adr/0002-agent-driven-adoption.md](docs/adr/0002-agent-driven-adoption.md) — architecture decisions
 - [manifest schema](docs/standard/manifest.md), [2026-08-27 baseline](docs/standard/migrations/2026-08-27.md), and [2026-08-28 migration](docs/standard/migrations/2026-08-28.md)
 - `.github/ISSUE_TEMPLATE/bug_report.yml`, `.github/ISSUE_TEMPLATE/config.yml`, `.github/pull_request_template.md` — community examples
