@@ -11,6 +11,8 @@ Resolve only choices that affect this project:
 - Does the behavior need tools, commands, UI, session state, storage, network access, or external processes? What should remain untouched?
 - Which development tools and conventions already fit? Explain alternatives through [Engineering resources](../../resources/engineering.md), not a mandatory stack.
 
+For a hosted repository or planned collaboration, use [Repository governance](../maintain/repository.md) to assess access, protections, and operational controls. Keep remote changes separately authorized. A local-only target does not require repository hosting.
+
 If scope or architecture remains uncertain, use [Design](design.md). Present a reasoned proposal and ask about consequential unresolved preferences. Avoid asking the user to choose every filename or dependency.
 
 Create the smallest authorized implementation that proves the chosen behavior. Derive entry points and metadata from Pi's current contract and the target's distribution choice. A build step, package manifest, CI workflow, and release process each need a purpose; local-only resources may not need them.
