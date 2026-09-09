@@ -30,6 +30,7 @@ Begin with [Start](prompts/start.md). Then choose [Set up a project](prompts/dis
 | Assess an existing project or changeset | [Audit](prompts/verify/audit.md) |
 | Investigate trust boundaries and supply-chain risk | [Review security](prompts/verify/security.md) |
 | Check the distributable artifact | [Verify packaging](prompts/verify/package.md) |
+| Establish or review repository access, protections, and governance | [Configure repository governance](prompts/maintain/repository.md) |
 | Choose or repair CI | [Work on CI](prompts/maintain/ci.md) |
 | Research and update dependencies or host versions | [Update dependencies](prompts/maintain/dependencies.md) |
 | Change data, configuration, APIs, or distribution identity | [Migrate](prompts/maintain/migrate.md) |

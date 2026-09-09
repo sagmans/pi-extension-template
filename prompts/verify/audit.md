@@ -8,6 +8,8 @@ Read the target's purpose, instructions, support claims, decisions, source, conf
 
 Consider architecture and ownership; host integration and lifecycle; user experience and modes; configuration, persistence, and recovery; dependencies and trust; tests and real-use proof; package contents; CI and release controls; documentation and maintenance. Explain what is not applicable. Do not invent a missing release process for a local-only extension.
 
+For hosted collaboration or repository-policy risks, use [Repository governance](../maintain/repository.md) to inspect effective access and protections. Local files do not prove remote settings. Record inaccessible provider state as unknown, not absent.
+
 Prefer public Pi APIs, but assess deliberate private coupling against the target's needs, version scope, and failure behavior. A broad peer range is not proof of broad support. An existing test is evidence of intent until a relevant run establishes its result.
 
 For every candidate finding, identify the violated target requirement or plausible consequence, cite the owning evidence, and attempt to disprove it. Distinguish actual defects from risks and preferences. Preserve strengths. Do not pad empty categories or score compliance with this reference.
