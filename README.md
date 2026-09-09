@@ -1,86 +1,50 @@
-# Pi Extension Blueprint
+# Pi Extension Reference
 
-## Reference only
+A linked prompt library for AI agents developing Pi extensions in other repositories.
 
-**Reference blueprint only: this repository is not shipped, deployed, released, or published.**
+**Reference only.** Nothing here installs, runs, or publishes an extension. There are no project scaffolds to copy. Agents learn from Pi's resources, explore the target, interview the user, and derive an appropriate implementation.
 
-This repository is an executable reference for public npm packages containing one [Pi](https://github.com/earendil-works/pi-mono) extension. Its active automation verifies the blueprint. Its package is private. Its publication workflow is an inert example.
+Recommendations are advisory. They do not impose a stack, project layout, support matrix, or compliance score. The target's requirements and the user's authorization govern the work.
 
-## Use with an agent
+## Start with an outcome
 
-Always run an agent from this repository so project-local skills are discoverable. Give the agent the absolute target repository path. Require it to read this README completely before touching the target.
+Give your agent access to this reference and identify the target repository and desired outcome. It need not run from this repository or install a skill.
 
-```text
-Read this repository's README completely. Use the adopt-pi-extension-template skill to set up the target repository at the absolute path I provide. Preserve target-specific intent, ask before ambiguous choices, run full verification, and do not commit or publish.
-```
+> Read the reference's start guide, then follow its setup prompt for my target. Explore and learn first. Explain consequential choices before asking me. Create a tailored working project, not a copy of the reference.
 
-Use `/skill:adopt-pi-extension-template` or `/skill:audit-pi-extension` when automatic skill selection does not occur.
+> Read the reference's start guide, then audit my target against its purpose and claims. Inspect only. Report strengths, defects, risks, recommendations, and missing evidence. Propose execution checks separately.
 
-## New empty repository
+Begin with [Start](prompts/start.md). Then choose [Set up a project](prompts/discover/setup.md) or [Audit a project](prompts/verify/audit.md). If an agent receives a deep-linked prompt first, it should follow that prompt's Start link before acting.
 
-Use [adopt-pi-extension-template](.agents/skills/adopt-pi-extension-template/SKILL.md). The agent gathers package identity, purpose, imported Pi APIs, platforms, and publication intent. It adapts this blueprint, keeps publication inert until external setup is complete, runs verification, and writes provenance last.
+## Find the operation
 
-## Audit an existing repository
+| Outcome | Prompt |
+| --- | --- |
+| Establish a usable new or unfinished project | [Set up](prompts/discover/setup.md) |
+| Choose scope, boundaries, and host integration | [Design](prompts/discover/design.md) |
+| Add or change behavior | [Implement](prompts/develop/implement.md) |
+| Reproduce a failure and fix its cause | [Debug](prompts/develop/debug.md) |
+| Simplify without changing behavior | [Refactor](prompts/develop/refactor.md) |
+| Reduce measured latency, resource use, or context cost | [Improve performance](prompts/develop/performance.md) |
+| Design tests and prove actual use | [Verify](prompts/verify/test.md) |
+| Assess an existing project or changeset | [Audit](prompts/verify/audit.md) |
+| Investigate trust boundaries and supply-chain risk | [Review security](prompts/verify/security.md) |
+| Check the distributable artifact | [Verify packaging](prompts/verify/package.md) |
+| Choose or repair CI | [Work on CI](prompts/maintain/ci.md) |
+| Research and update dependencies or host versions | [Update dependencies](prompts/maintain/dependencies.md) |
+| Change data, configuration, APIs, or distribution identity | [Migrate](prompts/maintain/migrate.md) |
+| Align documentation, agent guidance, and collaboration | [Document](prompts/maintain/document.md) |
+| Triage issues and recurring maintenance | [Maintain](prompts/maintain/triage.md) |
+| Establish or review package ownership and publishing access | [Configure publishing](prompts/release/access.md) |
+| Assess release readiness without publishing | [Prepare a release](prompts/release/prepare.md) |
+| Publish an approved package and verify delivery | [Publish](prompts/release/publish.md) |
+| Deliver a service when an extension actually needs one | [Deploy](prompts/release/deploy.md) |
+| Respond to a failed release, incident, deprecation, or retirement | [Recover](prompts/release/recover.md) |
 
-Use [audit-pi-extension](.agents/skills/audit-pi-extension/SKILL.md):
+These are entry routes, not mandatory lifecycle phases. Follow only relevant links. Pi APIs belong in [upstream resources](resources/pi.md), not in a second local manual. Tool choices and community examples live in [Engineering resources](resources/engineering.md).
 
-```text
-Read this repository's README completely. Use the audit-pi-extension skill against the target repository at the absolute path I provide. Make no target changes. Report required drift, recommendations, intentional divergence, and exact validation commands.
-```
+## Maintain this reference
 
-Audit is evidence-only. It also reports unsupported Pi SDK usage, private internals, monkey patches, and undocumented runtime coupling with public-API suggestions; it takes no corrective action. Missing provenance means legacy, not automatically unsafe.
+[Development](DEVELOPMENT.md) explains local checks and representative usage. [Agent instructions](AGENTS.md) govern edits here, not other repositories. [Domain language](CONTEXT.md) defines the terms used by the prompts. [Architecture decisions](docs/adr/0003-advisory-reference.md) explain the conversion; [changelog](CHANGELOG.md) preserves history.
 
-## Onboard, migrate, or update an existing repository
-
-Run audit first, review its classification, then run `adopt-pi-extension-template`. The skill preserves extension behavior and project facts, applies ordered date migrations, asks one focused question per ambiguous conflict, validates, then advances `.pi-extension-template.json`.
-
-## What the blueprint standardizes
-
-- Current Node LTS pinned through mise, npm lockfile, TypeScript source, and one Pi extension per package
-- Biome, strict TypeScript, Vitest, and 80% global coverage
-- High-or-critical dependency audit policy
-- Package allowlist and exact packed-artifact Pi-load smoke
-- Linux CI baseline, pinned Actions, minimal permissions, and Dependabot
-- Release PR, signed tag, npm OIDC, provenance, approval environment, and immutable artifact
-- Agent, development, security, contribution, domain, ADR, diagnostics, configuration, storage, and smoke guidance
-
-## What agents must adapt
-
-Adapt package identity, repository URLs, extension entry files, package allowlist, imported Pi peer dependencies, support matrix, tests, user documentation, configuration, diagnostics, storage, and target-specific real usage. Preserve stronger controls. Never copy this repository's private identity or reference-only wording into a release-ready target.
-
-## Verification contract
-
-Run `npm run verify:ci`. It covers dependency audit, Biome, strict types, Vitest coverage, package allowlist, one packed tarball, isolated installation, and Pi entrypoint loading. Feature-specific real usage remains a target responsibility.
-
-See [DEVELOPMENT.md](DEVELOPMENT.md) and [docs/maintainer-smoke.md](docs/maintainer-smoke.md).
-
-## Release contract
-
-Nothing here releases. Target repositories adapt `.github/workflows/release.yml.example` only after completing [npm release setup](docs/npm-release-setup.md). Follow [RELEASE.md](RELEASE.md).
-
-## Repository map
-
-- [AGENTS.md](AGENTS.md) — required generic agent workflow
-- [DEVELOPMENT.md](DEVELOPMENT.md) — local engineering and dependency updates
-- [RELEASE.md](RELEASE.md) — target release procedure
-- [SECURITY.md](SECURITY.md) — private vulnerability handling
-- [CONTRIBUTING.md](CONTRIBUTING.md) — public participation
-- [CHANGELOG.md](CHANGELOG.md) — standard evolution
-- [CONTEXT.md](CONTEXT.md) — domain language
-- [docs/diagnostics.md](docs/diagnostics.md), [docs/configuration.md](docs/configuration.md), [docs/storage.md](docs/storage.md) — adapt-or-remove extension guidance
-- [docs/standard/host-pitfalls.md](docs/standard/host-pitfalls.md) — verified host integration failure modes with citations and reproducible checks
-- [docs/adr/0001-reference-blueprint.md](docs/adr/0001-reference-blueprint.md), [docs/adr/0002-agent-driven-adoption.md](docs/adr/0002-agent-driven-adoption.md) — architecture decisions
-- [manifest schema](docs/standard/manifest.md), [2026-08-27 baseline](docs/standard/migrations/2026-08-27.md), and [2026-08-28 migration](docs/standard/migrations/2026-08-28.md)
-- `.github/ISSUE_TEMPLATE/bug_report.yml`, `.github/ISSUE_TEMPLATE/config.yml`, `.github/pull_request_template.md` — community examples
-
-## Standard version and migrations
-
-The blueprint standard version is `2026-08-28`. Target provenance lives in `.pi-extension-template.json`. Apply every migration note after the target's recorded date in chronological order; update the marker only after successful verification.
-
-## Security
-
-Pi extensions execute with the user's full permissions. Review target code and dependencies before installation. Report sensitive findings privately according to [SECURITY.md](SECURITY.md); never place secrets, private prompts, session files, or personal paths in public issues.
-
-## License
-
-[MIT](LICENSE)
+Report sensitive findings through [Security](SECURITY.md). [Contribution policy](CONTRIBUTING.md) is unchanged. This library is available under the [MIT License](LICENSE).

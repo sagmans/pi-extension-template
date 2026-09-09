@@ -1,14 +1,13 @@
 # Agent Instructions
 
-This repository is a non-publishing reference blueprint. Read [README.md](README.md) completely before setup, audit, onboarding, migration, or update work.
+This repository maintains an advisory prompt reference, not an extension package. Read [README.md](README.md) before changing it. To work on another repository, enter through [Start](prompts/start.md); these maintenance instructions are not a target scaffold.
 
-- Read all target instructions before inspecting or changing a target repository.
-- Preserve target extension behavior, domain facts, data formats, and support claims.
-- Use test-driven development for behavior and verification scripts.
-- Follow [DEVELOPMENT.md](DEVELOPMENT.md) for implementation and dependency work.
-- Follow [SECURITY.md](SECURITY.md) for vulnerabilities, secrets, trust boundaries, or private data.
-- Follow [RELEASE.md](RELEASE.md) for release preparation.
-- Run `npm run verify:ci` and documented real usage before claiming completion.
-- Research primary release and advisory sources before dependency updates.
-- Keep reports and artifacts free of secrets, private prompts, session data, and personal paths.
-- Obtain explicit approval before any commit, tag, push, publish, deployment, or remote setting change.
+- Preserve outcome-oriented navigation and the terms in [CONTEXT.md](CONTEXT.md).
+- Link Pi-owned documentation, examples, and APIs instead of reproducing them.
+- Keep recommendations distinct from target requirements and execution authority.
+- Follow [DEVELOPMENT.md](DEVELOPMENT.md) for reference changes, checks, and actual-use evidence.
+- Use test-first development for any generic helper; retain one only for demonstrated stable mechanics.
+- Follow [SECURITY.md](SECURITY.md) for private findings and untrusted sources.
+- Keep research, plans, and usage artifacts local and ignored unless their publication is explicitly approved.
+- Preserve the contribution policy and license; no package publication or target setup occurs as reference maintenance.
+- Obtain explicit approval before committing, tagging, pushing, publishing, deploying, or changing remote settings.
