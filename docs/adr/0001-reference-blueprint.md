@@ -2,7 +2,7 @@
 
 ## Status
 
-Accepted — 2026-08-27
+Superseded by [ADR 0003](0003-advisory-reference.md). Originally accepted 2026-08-27. The decision below is historical, not current operating guidance.
 
 ## Decision
 

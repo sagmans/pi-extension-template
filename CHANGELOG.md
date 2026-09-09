@@ -2,6 +2,13 @@
 
 ## Unreleased
 
+- Replaced the executable blueprint with linked, advisory prompts for the Pi extension lifecycle.
+- Added source-selection and community-prior-art guidance without duplicating Pi's manuals.
+- Removed physical scaffolds, adoption markers, prescribed tooling, and publishing setup automation.
+- Replaced package verification with dependency-free local link checks and representative reference-usage checks.
+
+The dated entries below describe the historical blueprint, not the current reference's requirements.
+
 ## 2026-08-28
 
 - Made mise the sole runtime manager across local development and automation.
