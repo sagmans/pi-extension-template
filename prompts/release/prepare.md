@@ -10,4 +10,6 @@ Inspect the applicable publication authority through [Publishing access](access.
 
 Present a concise readiness decision against actual target requirements: ready for the authorized next step, blocked by a named condition, or unverified in a named area. Separate recommended improvements from blockers and known accepted limitations. Include artifact identity, checks, release notes, recovery approach, and the exact next action requiring authorization.
 
+The [optional npm helpers](../../docs/npm-release-setup.md) can check explicit source and package identity. They do not replace artifact installation, runtime evidence, or approval. Preparation does not run their mutation actions.
+
 Stop after the readiness report. Continue to [Publish](publish.md) only when the user's authorization covers that specific release action. Passing local checks alone does not prove a remote release path.

@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- Added optional npm release helpers adapted from pi-history, with explicit registry and artifact identity, independent approvals, and disposable subprocess tests.
+- Kept workflow design and release authorization with the target instead of restoring the historical scaffold.
+
 - Replaced the executable blueprint with linked, advisory prompts for the Pi extension lifecycle.
 - Added source-selection and community-prior-art guidance without duplicating Pi's manuals.
 - Removed physical scaffolds, adoption markers, prescribed tooling, and publishing setup automation.

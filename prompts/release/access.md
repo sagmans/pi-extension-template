@@ -6,6 +6,8 @@ Inspect authorized read-only account and package metadata. Distinguish absence f
 
 Read current registry and CI documentation through [Engineering resources](../../resources/engineering.md), plus installed CLI help. Provider schemas and permissions change. If sources disagree, describe the contradiction and seek current evidence rather than encoding either claim as a universal setup script.
 
+For public scoped packages on npm with GitHub.com, consider the [optional release helpers](../../docs/npm-release-setup.md). Their supported policy is one option, not an access requirement. Inspect their dry run before approving an individual mutation.
+
 Separate the decisions:
 
 - Who may publish, administer access, and approve releases?
