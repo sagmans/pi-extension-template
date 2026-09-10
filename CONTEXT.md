@@ -61,7 +61,7 @@ A question that available sources or verification cannot resolve. The agent stat
 _Avoid_: Invented guarantee, assumed test pass
 
 **Generic helper**:
-An optional script for demonstrated, repeated mechanical work whose inputs and outputs remain useful across targets. It does not choose project policy or encode changing host or provider behavior.
+An optional script for demonstrated, repeated mechanical work whose inputs and outputs remain useful across targets. It does not choose project policy implicitly. Provider-specific release helpers declare their supported contracts, require explicit target choices, and stop on unknown responses.
 _Avoid_: Setup generator, scripted engineering judgment
 
 **Community prior art**:

@@ -10,4 +10,5 @@ This repository maintains an advisory prompt reference, not an extension package
 - Follow [SECURITY.md](SECURITY.md) for private findings and untrusted sources.
 - Keep research, plans, and usage artifacts local and ignored unless their publication is explicitly approved.
 - Preserve the contribution policy and license; no package publication or target setup occurs as reference maintenance.
+- For optional release-helper changes or use, read [the setup guide](docs/npm-release-setup.md). Keep target selection, artifact identity, dry-run behavior, and per-action approval explicit.
 - Obtain explicit approval before committing, tagging, pushing, publishing, deploying, or changing remote settings.

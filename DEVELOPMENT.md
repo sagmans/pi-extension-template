@@ -1,6 +1,6 @@
 # Maintain the reference
 
-There is no extension runtime, package installation, build, or publishing setup here. Read [README.md](README.md), then edit the smallest set of prompts that serves the requested outcome.
+There is no extension runtime or publishable package here. Read [README.md](README.md), then edit the smallest set of prompts or optional helpers that serves the requested outcome.
 
 ## Writing changes
 
@@ -24,7 +24,9 @@ The helper checks local file destinations in inline Markdown links outside fence
 
 The old `npm run verify:ci` contract belonged to the removed executable blueprint. The commands above and representative usage replace it. CI checks the reference, not target extension compatibility or release readiness.
 
-A new helper needs demonstrated repeated mechanical work that native tools do not already cover more simply. Keep inputs explicit, avoid project-policy assumptions, and add a failing behavioral test before implementing it. Do not add generators, setup scripts, or publishing wrappers.
+A new helper needs demonstrated repeated mechanical work that native tools do not already cover more simply. Keep inputs explicit, avoid hidden project-policy assumptions, and add a failing behavioral test before implementing it. [Optional release helpers](docs/npm-release-setup.md) are a narrow approved exception for repeated publication and access checks. They use Python's standard library, native CLIs, explicit target identity, and independent action approval. Do not add generators or automatic target setup.
+
+The release tests run real helper subprocesses against disposable targets and synthetic npm/GitHub CLIs. They never publish or change remote controls. Their passing result does not prove live 2FA, OIDC delivery, or provider availability. After a helper change, exercise safe native read-only checks where credentials permit. Report missing live evidence explicitly.
 
 ## Representative usage
 

@@ -2,7 +2,7 @@
 
 A linked prompt library for AI agents developing Pi extensions in other repositories.
 
-**Reference only.** Nothing here installs, runs, or publishes an extension. There are no project scaffolds to copy. Agents learn from Pi's resources, explore the target, interview the user, and derive an appropriate implementation.
+**Advisory reference.** Reading the prompts performs no setup or publication. There are no project scaffolds to copy. Agents learn from Pi's resources, explore the target, interview the user, and derive an appropriate implementation. [Optional npm release helpers](docs/npm-release-setup.md) can operate on an explicitly selected target, with separate approval for every remote action.
 
 Recommendations are advisory. They do not impose a stack, project layout, support matrix, or compliance score. The target's requirements and the user's authorization govern the work.
 

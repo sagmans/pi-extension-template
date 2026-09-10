@@ -4,7 +4,7 @@ Follow [Start](../start.md). Require the applicable authorization for the specif
 
 Inspect current registry state and release workflow identity before mutation. Use primary provider resources from [Engineering resources](../../resources/engineering.md). Do not infer package absence from an authentication or network error. Recheck that a concurrent release has not already published the version.
 
-For first publication, follow the separately approved bootstrap authority and then return to the intended recurring process. For recurring publication, use the target's approved workflow or manual procedure. Direct publication and staged publication are different outcomes; confirm which is authorized. Never substitute a broader token or a different registry when the intended path fails.
+For first publication, follow the separately approved bootstrap authority and then return to the intended recurring process. The [optional npm helpers](../../docs/npm-release-setup.md) support a reviewed tarball and independent trust configuration. Their existence supplies no publication authority. For recurring publication, use the target's approved workflow or manual procedure. Direct publication and staged publication are different outcomes; confirm which is authorized. Never substitute a broader token or a different registry when the intended path fails.
 
 Publish the verified artifact through the approved mechanism. If the mechanism rebuilds it, identify that as a new artifact and ensure the target's release evidence covers the bytes actually delivered. Preserve source-to-artifact identity and any applicable approval, signing, and provenance requirements. Do not invent a universal tag or CI job layout.
 
