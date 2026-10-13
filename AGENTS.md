@@ -12,3 +12,7 @@ This repository maintains an advisory prompt reference, not an extension package
 - Preserve the contribution policy and license; no package publication or target setup occurs as reference maintenance.
 - For optional release-helper changes or use, read [the setup guide](docs/npm-release-setup.md). Keep target selection, artifact identity, dry-run behavior, and per-action approval explicit.
 - Obtain explicit approval before committing, tagging, pushing, publishing, deploying, or changing remote settings.
+
+## Git hooks
+
+Checks run in `.githooks/`, not in push/PR CI. Run `sh scripts/setup-hooks.sh` once per clone; never bypass hooks with `--no-verify`. `pre-push`: unit tests and link check.
