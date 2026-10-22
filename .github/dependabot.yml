@@ -1,6 +1,17 @@
+# Dependabot policy. The repository has no workflows today; this entry keeps any
+# workflow added later on the same supply-chain window as the other sagmans repos.
 version: 2
 updates:
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
       interval: "weekly"
+    # A release must survive a week of public scrutiny before a bot pull request
+    # proposes it, so a compromised or retagged action can be caught upstream.
+    # GitHub Actions supports default-days only.
+    cooldown:
+      default-days: 7
+    # Action pins move together, so one pull request per week is enough.
+    groups:
+      actions:
+        patterns: ["*"]
