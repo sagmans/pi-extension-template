@@ -1,0 +1,54 @@
+# Development tooling for the Python helpers and their tests. The repository
+# is a prompt reference, not a Python package: uv only installs the pinned
+# lint and format tool from uv.lock, and the helpers keep using the standard
+# library alone.
+[project]
+name = "pi-extension-template-dev"
+version = "0.0.0"
+requires-python = ">=3.11"
+dependencies = []
+
+[dependency-groups]
+dev = ["ruff==0.17.2"]
+
+[tool.uv]
+package = false
+# Supply chain window: uv only resolves releases older than 7 days, the same
+# window that the other sagmans repositories use.
+exclude-newer = "7 days"
+# Use an installed Python 3.11+; a managed download is not pinned by uv.lock.
+python-downloads = "never"
+
+[tool.ruff]
+# Matches the oldest Python that DEVELOPMENT.md supports.
+target-version = "py311"
+line-length = 100
+
+[tool.ruff.lint]
+# Strictest set: every rule, then only the exceptions below.
+select = ["ALL"]
+ignore = [
+  # These conflict with the formatter (ruff documents them as incompatible).
+  "COM812",
+  "ISC001",
+  # Pairs of mutually exclusive docstring styles: keep D211 and D212.
+  "D203",
+  "D213",
+  # The license is stated once in LICENSE; files carry no copyright headers.
+  "CPY001",
+  # scripts/ and test/ hold entry-point scripts and unittest discovery
+  # directories, not importable packages.
+  "INP001",
+  # The helpers are command-line tools: standard output is their interface.
+  "T201",
+]
+
+[tool.ruff.lint.per-file-ignores]
+"test/**" = [
+  # The suite runs on the standard-library unittest runner (DEVELOPMENT.md:
+  # no dependencies), so unittest assertions are the right API.
+  "PT009",
+  # Test names state the behavior under test. A docstring would replace the
+  # name in unittest's verbose output and hide it.
+  "D1",
+]

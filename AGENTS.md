@@ -15,4 +15,4 @@ This repository maintains an advisory prompt reference, not an extension package
 
 ## Git hooks
 
-Checks run in `.githooks/`, not in push/PR CI. Run `scripts/setup-hooks` after cloning. All checks must pass before you push. Never use `--no-verify`. `pre-push`: unit tests and link check.
+Checks run in `.githooks/`, not in push/PR CI. Run `scripts/setup-hooks` after cloning. All checks must pass before you push. Never use `--no-verify`. `pre-commit`: ruff on the staged Python files. `pre-push`: ruff, unit tests and link check. ruff runs through uv from `uv.lock`.

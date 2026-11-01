@@ -8,17 +8,23 @@ CHECKER = Path(__file__).resolve().parents[1] / "scripts" / "check_links.py"
 COMMAND = (sys.executable, str(CHECKER))
 README = "README.md"
 DESTINATION = "child page.md"
-VALID_LINKS = "[child](child%20page.md#heading)\n[web](https://example.invalid/)\n[anchor](#local)\n"
+VALID_LINKS = (
+    "[child](child%20page.md#heading)\n[web](https://example.invalid/)\n[anchor](#local)\n"
+)
 MISSING_LINK = "[missing](missing.md)\n"
-CODE_LINKS = "```md\n[example](absent.md)\n```\n`[example](absent.md)`\n~~~\n[example](absent.md)\n~~~\n"
+CODE_LINKS = (
+    "```md\n[example](absent.md)\n```\n`[example](absent.md)`\n~~~\n[example](absent.md)\n~~~\n"
+)
 TIMEOUT = 10
 
 
 class LinkCheckTests(unittest.TestCase):
-    def run_check(self, root):
-        return subprocess.run((*COMMAND, str(root)), capture_output=True, text=True, timeout=TIMEOUT)
+    def run_check(self, root: Path) -> subprocess.CompletedProcess[str]:
+        return subprocess.run(  # noqa: S603 argv list, no shell; this repo's own checker
+            (*COMMAND, str(root)), capture_output=True, text=True, timeout=TIMEOUT, check=False
+        )
 
-    def test_valid_local_links_and_non_file_references(self):
+    def test_valid_local_links_and_non_file_references(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
             (root / README).write_text(VALID_LINKS)
@@ -26,7 +32,7 @@ class LinkCheckTests(unittest.TestCase):
             result = self.run_check(root)
             self.assertEqual(result.returncode, 0, result.stderr)
 
-    def test_missing_destination_names_source_and_line(self):
+    def test_missing_destination_names_source_and_line(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
             (root / README).write_text(MISSING_LINK)
@@ -35,13 +41,13 @@ class LinkCheckTests(unittest.TestCase):
             self.assertIn("README.md:1", result.stdout)
             self.assertIn("missing.md", result.stdout)
 
-    def test_code_examples_are_not_destinations(self):
+    def test_code_examples_are_not_destinations(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
             (root / README).write_text(CODE_LINKS)
             self.assertEqual(self.run_check(root).returncode, 0)
 
-    def test_external_file_and_symlink_boundaries(self):
+    def test_external_file_and_symlink_boundaries(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory) / "root"
             root.mkdir()
@@ -53,7 +59,7 @@ class LinkCheckTests(unittest.TestCase):
             self.assertEqual(result.returncode, 1, result.stderr)
             self.assertIn("outside root", result.stdout)
 
-    def test_ignored_artifacts_and_missing_root(self):
+    def test_ignored_artifacts_and_missing_root(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
             (root / "artifact").mkdir()

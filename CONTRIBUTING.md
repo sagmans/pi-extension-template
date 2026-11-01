@@ -10,5 +10,5 @@ Checks run in tracked local Git hooks instead of push/PR CI. Run `scripts/setup-
 
 This repository's checks:
 
-- `pre-commit`: staged whitespace and conflict-marker check.
-- `pre-push`: unit tests and link check.
+- `pre-commit`: staged whitespace and conflict-marker check; ruff format check and lint on the staged Python files.
+- `pre-push`: ruff format check and lint, unit tests and link check. Install [uv](https://docs.astral.sh/uv/); it runs ruff pinned in `uv.lock`.

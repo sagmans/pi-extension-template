@@ -12,9 +12,11 @@ Before removing old guidance, account for its useful reasoning. Preserve it in t
 
 ## Mechanical checks
 
-Python 3.11 or newer and its standard library are sufficient; no dependencies need installation.
+Python 3.11 or newer and its standard library are sufficient to run the helpers and tests. The hooks also run [ruff](https://docs.astral.sh/ruff/) for format and lint, pinned in `uv.lock`; install [uv](https://docs.astral.sh/uv/) to get it.
 
 ```sh
+uv run --locked ruff format --check .
+uv run --locked ruff check .
 python3 -m unittest discover -s test -p 'test_*.py'
 python3 scripts/check_links.py .
 git diff --check

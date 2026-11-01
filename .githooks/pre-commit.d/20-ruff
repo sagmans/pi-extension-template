@@ -1,0 +1,21 @@
+#!/bin/sh
+# Runs ruff (format check and lint) on the staged Python files, so style and
+# lint errors stop at commit time. ruff comes pinned from uv.lock through uv;
+# a missing uv blocks the commit. ruff reads the working-tree copies; the
+# pre-push hook runs ruff on the exact pushed commit.
+set -eu
+
+# Helpers (staged_git, pushed_shas, at_sha, darwin_only) from .githooks/lib.
+# shellcheck source=/dev/null
+. "${HOOK_HELPERS:?run from .githooks (scripts/setup-hooks)}"
+
+command -v uv >/dev/null || { echo "pre-commit: uv is not installed" >&2; exit 1; }
+
+# The NUL-separated list goes through a file: a pipeline would hide a failing
+# staged_git (sh has no pipefail), and NUL keeps any file name intact.
+list=$(mktemp) || exit 1
+trap 'rm -f "$list"' EXIT
+staged_git diff --cached --name-only --diff-filter=ACMR -z -- '*.py' >"$list" || exit 1
+[ -s "$list" ] || exit 0
+xargs -0 uv run --locked --quiet ruff format --check -- <"$list"
+xargs -0 uv run --locked --quiet ruff check -- <"$list"

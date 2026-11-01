@@ -3,6 +3,7 @@
 import argparse
 import os
 import re
+from collections.abc import Container, Iterator
 from pathlib import Path
 from urllib.parse import unquote, urlsplit
 
@@ -16,7 +17,8 @@ ERROR = 1
 SUCCESS = 0
 
 
-def destinations(text):
+def destinations(text: str) -> Iterator[tuple[int, str]]:
+    """Yield numbered link targets, skipping code so documented examples are not checked."""
     fence = None
     for number, line in enumerate(text.splitlines(), start=1):
         marker = FENCE.match(line)
@@ -24,14 +26,21 @@ def destinations(text):
             token = marker.group(1)
             if fence is None:
                 fence = token
-            elif token[0] == fence[0] and len(token) >= len(fence) and not line[marker.end():].strip():
+            elif (
+                token[0] == fence[0]
+                and len(token) >= len(fence)
+                and not line[marker.end() :].strip()
+            ):
                 fence = None
             continue
         if fence is None:
-            yield from ((number, match.group(1)) for match in LINK.finditer(INLINE_CODE.sub("", line)))
+            yield from (
+                (number, match.group(1)) for match in LINK.finditer(INLINE_CODE.sub("", line))
+            )
 
 
-def check(root, excludes):
+def check(root: Path, excludes: Container[str]) -> list[str]:
+    """Collect every broken local link under root so one run reports all of them."""
     failures = []
     for directory, folders, files in os.walk(root, followlinks=False):
         folders[:] = sorted(name for name in folders if name not in excludes)
@@ -55,7 +64,8 @@ def check(root, excludes):
     return failures
 
 
-def main():
+def main() -> int:
+    """Run the checker as a command whose exit status gates hooks and CI."""
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("root", type=Path)
     parser.add_argument("--exclude-dir", action="append", default=list(DEFAULT_EXCLUDES))

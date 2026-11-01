@@ -1,8 +1,11 @@
 #!/bin/sh
-# Runs the unit tests and the link check on each pushed commit.
+# Runs ruff, the unit tests and the link check on each pushed commit. ruff
+# comes pinned from uv.lock through uv; a missing uv blocks the push.
 set -eu
 
 checks() {
+	uv run --locked --quiet ruff format --check . || return 1
+	uv run --locked --quiet ruff check . || return 1
 	python3 -m unittest discover -s test -p 'test_*.py' || return 1
 	python3 scripts/check_links.py . || return 1
 }

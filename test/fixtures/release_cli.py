@@ -1,27 +1,37 @@
 """Synthetic CLI boundary; never contacts npm or GitHub."""
+
 import json
 import os
-from pathlib import Path
 import sys
+from pathlib import Path
 
 ARGS = sys.argv[1:]
 TOOL = Path(sys.argv[0]).name
 SCENARIO = os.environ.get("SCENARIO", "absent")
 STATE = Path("state.json")
-REGISTRY_FLAGS = ["--registry=https://registry.npmjs.org/", "--@example:registry=https://registry.npmjs.org/"]
-TRUST = {"id": "test", "type": "github", "file": "release.yml", "repository": "example/tool",
-         "environment": "npm-release", "permissions": ["createPackage"]}
-with open(os.environ["CALL_LOG"], "a") as log:
+REGISTRY_FLAGS = [
+    "--registry=https://registry.npmjs.org/",
+    "--@example:registry=https://registry.npmjs.org/",
+]
+TRUST = {
+    "id": "test",
+    "type": "github",
+    "file": "release.yml",
+    "repository": "example/tool",
+    "environment": "npm-release",
+    "permissions": ["createPackage"],
+}
+with Path(os.environ["CALL_LOG"]).open("a") as log:
     log.write(json.dumps([TOOL, *ARGS]) + "\n")
 state = json.loads(STATE.read_text()) if STATE.exists() else {}
 
 
-def output(value):
+def output(value: object) -> None:
     print(json.dumps(value))
     sys.exit(0)
 
 
-def save():
+def save() -> None:
     STATE.write_text(json.dumps(state))
 
 
@@ -73,7 +83,9 @@ if TOOL == "npm":
             print(json.dumps({"error": {"code": "E404"}}))
             sys.exit(1)
         metadata = json.loads(Path("package.json").read_text())
-        metadata["dist"] = {"integrity": "bad" if SCENARIO == "bad-integrity" else os.environ["ARTIFACT_INTEGRITY"]}
+        metadata["dist"] = {
+            "integrity": "bad" if SCENARIO == "bad-integrity" else os.environ["ARTIFACT_INTEGRITY"]
+        }
         output(metadata)
     if args[0] == "publish":
         if SCENARIO == "publish-error":
@@ -98,9 +110,12 @@ if TOOL == "gh":
             state["environment"] = {
                 "can_admins_bypass": payload["can_admins_bypass"],
                 "deployment_branch_policy": payload["deployment_branch_policy"],
-                "protection_rules": [{"type": "required_reviewers", "reviewers": [
-                    {"type": "User", "reviewer": {"id": 42, "login": "example"}}
-                ]}],
+                "protection_rules": [
+                    {
+                        "type": "required_reviewers",
+                        "reviewers": [{"type": "User", "reviewer": {"id": 42, "login": "example"}}],
+                    }
+                ],
             }
         elif endpoint == policies_endpoint:
             if SCENARIO == "policy-error":
@@ -118,11 +133,21 @@ if TOOL == "gh":
         output({"login": "example", "id": 42})
     if endpoint == environment_endpoint:
         if SCENARIO == "branch-policy":
-            output({"can_admins_bypass": False,
-                    "deployment_branch_policy": {"protected_branches": False, "custom_branch_policies": True},
-                    "protection_rules": [{"type": "required_reviewers", "reviewers": [
-                        {"type": "User", "reviewer": {"id": 42}}
-                    ]}]})
+            output(
+                {
+                    "can_admins_bypass": False,
+                    "deployment_branch_policy": {
+                        "protected_branches": False,
+                        "custom_branch_policies": True,
+                    },
+                    "protection_rules": [
+                        {
+                            "type": "required_reviewers",
+                            "reviewers": [{"type": "User", "reviewer": {"id": 42}}],
+                        }
+                    ],
+                }
+            )
         if "environment" in state:
             output(state["environment"])
         print("gh: Not Found (HTTP 404)", file=sys.stderr)
