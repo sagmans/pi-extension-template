@@ -13,6 +13,8 @@ dev = ["ruff==0.17.2"]
 
 [tool.uv]
 package = false
+# Tool environments must not select an interpreter supplied by the host OS.
+python-preference = "only-managed"
 # Supply chain window: uv only resolves releases older than 7 days, the same
 # window that the other sagmans repositories use.
 exclude-newer = "7 days"

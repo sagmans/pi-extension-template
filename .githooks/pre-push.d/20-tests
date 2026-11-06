@@ -4,10 +4,11 @@
 set -eu
 
 checks() {
+	bash scripts/check-python-runtime.sh || return 1
 	uv run --locked --quiet ruff format --check . || return 1
 	uv run --locked --quiet ruff check . || return 1
-	python3 -m unittest discover -s test -p 'test_*.py' || return 1
-	python3 scripts/check_links.py . || return 1
+	uv run --no-project --python-preference only-managed python -m unittest discover -s test -p 'test_*.py' || return 1
+	uv run --no-project --python-preference only-managed python scripts/check_links.py . || return 1
 }
 
 # Helpers (staged_git, pushed_shas, at_sha, darwin_only) from .githooks/lib.

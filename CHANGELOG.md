@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- Local Python entry points require uv-managed Python and refuse a missing uv.
+- The push gate detects bare Python commands and unmanaged Python shebangs.
+
 - Added optional npm release helpers adapted from pi-history, with explicit
   registry and artifact identity, independent approvals, and disposable
   subprocess tests.
