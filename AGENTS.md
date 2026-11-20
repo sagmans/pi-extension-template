@@ -29,8 +29,10 @@ instructions are not a target scaffold.
 
 Checks run in `.githooks/`, not in push/PR CI. Run `scripts/setup-hooks` after
 cloning. All checks must pass before you push. Never use `--no-verify`.
-`pre-commit`: ruff on the staged Python files. `pre-push`: ruff, unit tests and
-link check. ruff runs through uv from `uv.lock`.
+`pre-commit`: ruff on the staged Python files, and `shellcheck` + `shfmt` on
+the staged snapshot when shell scripts change. `pre-push`: Python runtime
+policy, ruff, mypy, `shellcheck` + `shfmt`, unit tests and link check. ruff and
+mypy run through uv from `uv.lock`.
 
 Commit messages follow `.githooks/GIT_CONVENTION.md`, which `commit-msg` and
 `pre-push` enforce. The generic checks need gitleaks, osv-scanner, semgrep,

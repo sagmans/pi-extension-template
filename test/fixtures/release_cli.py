@@ -13,7 +13,7 @@ REGISTRY_FLAGS = [
     "--registry=https://registry.npmjs.org/",
     "--@example:registry=https://registry.npmjs.org/",
 ]
-TRUST = {
+TRUST: dict[str, object] = {
     "id": "test",
     "type": "github",
     "file": "release.yml",
@@ -59,7 +59,7 @@ if TOOL == "npm":
         output("wrong" if SCENARIO == "wrong-user" else "example")
     if args[:2] == ["trust", "list"]:
         if SCENARIO == "extra-permission":
-            TRUST["permissions"].append("stagePackage")
+            TRUST["permissions"] = ["createPackage", "stagePackage"]
         if SCENARIO == "trust-conflict":
             TRUST["repository"] = "other/repo"
         output([TRUST] if state.get("trust") or SCENARIO != "absent" else [])

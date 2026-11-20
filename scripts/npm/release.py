@@ -10,7 +10,18 @@ import sys
 import tarfile
 from pathlib import Path
 
-from execution import JSON, ReleaseError, mutate, read_json, require, run, setting
+from execution import (
+    JSON,
+    ReleaseError,
+    mutate,
+    read_json,
+    require,
+    require_list,
+    require_object,
+    require_present,
+    run,
+    setting,
+)
 from github_release import setup_github
 
 REGISTRY = "https://registry.npmjs.org/"
@@ -44,8 +55,7 @@ class Target:
         self.git_bin = os.environ.get("GIT_BIN", "git")
         self.gh_bin = os.environ.get("GH_BIN", "gh")
         self.scope = self.package.split("/")[0]
-        self.metadata = read_json(Path("package.json").read_text())
-        self.validate_metadata(self.metadata)
+        self.metadata = self.validate_metadata(read_json(Path("package.json").read_text()))
 
     def npm_command(self, *args: str) -> list[str]:
         """Build an npm call that cannot reach a registry other than the public one."""
@@ -61,15 +71,13 @@ class Target:
         """Run a read-only npm call against the pinned registry."""
         return run(self.npm_command(*args), check=check)
 
-    def validate_metadata(self, metadata: JSON) -> None:
+    def validate_metadata(self, metadata: JSON) -> dict[str, JSON]:
         """Reject metadata that would publish another package, version, or source."""
-        require(isinstance(metadata, dict), "package metadata must be an object")
-        require(metadata.get("name") == self.package, "package name does not match PKG_NAME")
-        require(
-            metadata.get("version") == self.version, "package version does not match PKG_VERSION"
-        )
-        require(metadata.get("private") is not True, "package is private")
-        repository = metadata.get("repository")
+        parsed = require_object(metadata, "package metadata must be an object")
+        require(parsed.get("name") == self.package, "package name does not match PKG_NAME")
+        require(parsed.get("version") == self.version, "package version does not match PKG_VERSION")
+        require(parsed.get("private") is not True, "package is private")
+        repository = parsed.get("repository")
         url = repository.get("url") if isinstance(repository, dict) else repository
         require(
             url
@@ -81,13 +89,13 @@ class Target:
             ),
             "package repository does not match REPO",
         )
-        config = metadata.get("publishConfig", {})
-        require(isinstance(config, dict), "publishConfig must be an object")
+        config = require_object(parsed.get("publishConfig", {}), "publishConfig must be an object")
         allowed = {"access": "public", "registry": REGISTRY, "tag": "latest"}
         require(
             all(key in allowed and value == allowed[key] for key, value in config.items()),
             "unsupported or conflicting publishConfig; review it explicitly",
         )
+        return parsed
 
     def authenticate(self) -> None:
         """Confirm a supported npm and the expected account before any registry action."""
@@ -139,7 +147,9 @@ class Target:
                         member.isfile() and member.size <= MAX_MANIFEST_BYTES,
                         "invalid artifact manifest",
                     )
-                    with archive.extractfile(member) as stream:
+                    with require_present(
+                        archive.extractfile(member), "invalid artifact manifest"
+                    ) as stream:
                         manifests.append(read_json(stream.read().decode()))
         require(
             len(manifests) == 1 and manifests[0] == self.metadata,
@@ -161,12 +171,12 @@ class Target:
     def expected_trust(self, configs: JSON) -> bool:
         """Accept only the single publish-only trusted publisher for the reviewed workflow."""
         workflow, environment = self.workflow()
-        require(isinstance(configs, list), "unexpected npm trust response schema")
+        entries = require_list(configs, "unexpected npm trust response schema")
         return (
-            len(configs) == 1
-            and isinstance(configs[0], dict)
+            len(entries) == 1
+            and isinstance(entries[0], dict)
             and all(
-                configs[0].get(key) == value
+                entries[0].get(key) == value
                 for key, value in {
                     "type": "github",
                     "file": workflow,
@@ -177,11 +187,19 @@ class Target:
             )
         )
 
-    def registry_metadata(self) -> JSON:
+    def registry_metadata(self) -> dict[str, JSON]:
         """Fetch the published version and hold it to the same rules as local metadata."""
         metadata = read_json(self.npm("view", f"{self.package}@{self.version}", "--json").stdout)
-        self.validate_metadata(metadata)
-        return metadata
+        return self.validate_metadata(metadata)
+
+    def verify_registry_integrity(self, message: str) -> None:
+        """Confirm the published tarball integrity matches the reviewed artifact."""
+        metadata = self.registry_metadata()
+        dist = metadata.get("dist")
+        require(
+            isinstance(dist, dict) and dist.get("integrity") == setting("ARTIFACT_INTEGRITY"),
+            message,
+        )
 
 
 def bootstrap(target: Target) -> None:
@@ -190,11 +208,11 @@ def bootstrap(target: Target) -> None:
     result = target.npm("view", target.package, "name", "--json", check=False)
     require(result.returncode != 0, "package already exists; bootstrap is not allowed")
     response = read_json(result.stdout)
+    error_body = response.get("error") if isinstance(response, dict) else None
     require(
         result.returncode == 1
-        and isinstance(response, dict)
-        and isinstance(response.get("error"), dict)
-        and response["error"].get("code") == "E404",
+        and isinstance(error_body, dict)
+        and error_body.get("code") == "E404",
         "unable to establish an explicit registry not-found response",
     )
     print(
@@ -209,10 +227,8 @@ def bootstrap(target: Target) -> None:
         ),
     )
     if os.environ.get("DRY_RUN", "0") != "1":
-        metadata = target.registry_metadata()
-        require(
-            metadata.get("dist", {}).get("integrity") == setting("ARTIFACT_INTEGRITY"),
-            "published integrity mismatch; inspect remote state, do not retry",
+        target.verify_registry_integrity(
+            "published integrity mismatch; inspect remote state, do not retry"
         )
         print(
             "Published version and integrity verified. "
@@ -258,11 +274,7 @@ def configure_trust(target: Target) -> None:
 def verify(target: Target) -> None:
     """Read back the registry state that the release claims, without changing it."""
     target.artifact()
-    metadata = target.registry_metadata()
-    require(
-        metadata.get("dist", {}).get("integrity") == setting("ARTIFACT_INTEGRITY"),
-        "registry integrity mismatch",
-    )
+    target.verify_registry_integrity("registry integrity mismatch")
     access = read_json(target.npm("access", "get", "status", target.package, "--json").stdout)
     require(
         isinstance(access, dict) and access.get(target.package) == "public",

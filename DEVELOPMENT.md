@@ -24,12 +24,13 @@ implementation remains in Git; do not keep a scaffold archive.
 
 uv-managed Python 3.11 or newer and its standard library are sufficient to run
 the helpers and tests. The hooks also run [ruff](https://docs.astral.sh/ruff/)
-for format and lint, pinned in `uv.lock`; install
-[uv](https://docs.astral.sh/uv/) to get it.
+for format and lint and [mypy](https://mypy-lang.org/) for strict type checking,
+both pinned in `uv.lock`; install [uv](https://docs.astral.sh/uv/) to get them.
 
 ```sh
 uv run --locked ruff format --check .
 uv run --locked ruff check .
+uv run --locked mypy scripts test
 uv run --no-project --python-preference only-managed python -m unittest discover -s test -p 'test_*.py'
 uv run --no-project --python-preference only-managed python scripts/check_links.py .
 git diff --check
